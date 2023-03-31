@@ -1,37 +1,41 @@
-// Builds email with training information and sends it
 /**
- * Explanation
- * This code sends an email with training information to the user.
- * It first sets various constants such as sheet name, column names, and
- * the number of days to send the email ahead of the date.
- * Then it defines two functions: getEmailDate which returns the
- * formatted date for sending the email, and sendEmailNotification which
- * sends the actual email.
+ * Builds email with training information and sends it
  *
- * The main function retrieves the spreadsheet, sheet, and range of data for the sheet.
- * It then goes through each row to find the row with the matching date as the emailDate.
- * If a match is found, it stores the data in an object called emailContent.
- * If emailContent is not empty and EMAIL_ON is true,
- * it sends the email using the sendEmailNotification function.
+ * Explanation
+ * This code sets up a Google Sheet that contains a training schedule, then
+ * uses Apps Script to send email reminders to the user about upcoming workouts.
+ * The code defines constants for the sheet name, header row and column names,
+ * and email settings. It then creates a Spreadsheet class that represents the
+ * training schedule, with methods for getting the email date and email content.
+ * Finally, it creates an EmailSender class that sends the email using a template
+ * file and the MailApp service. The main() function brings everything together
+ * by creating instances of the Spreadsheet and EmailSender classes and sending
+ * the email if email reminders are turned on and there is an upcoming workout
+ * scheduled.
+ *
+ * This code needs a Google Spreadsheet and an email.html template.
+ * Get the Google Spreadsheet here: https://docs.google.com/spreadsheets/d/1OrGPV743KBXale8ZKQXNKI8ubKRcnBoipjITNq0zHm4/edit?usp=sharing
+ *
+ * Developed by Juan Lazarde. 2023
  */
 
 // Sets sheet name
 const SHEET_NAME = "Training Schedule";
 
-// Sets header-row and column names and index numbers. Starts at 0
-const HEADER_ROW = 5;
+// Sets header-row and column names and index numbers
+const HEADER_ROW = 3;
 const COLUMNS = {
-  date: 1,
-  week: 2,
-  dte: 3,
-  workout: 4,
-  exercise: 5,
-  link: 6,
+  date: 0,
+  week: 1,
+  dte: 2,
+  workout: 3,
+  exercise: 4,
+  link: 5,
 };
 
-// Sets email to be sent or not and the number of days to send email ahead of the date. Same day is 0
+// Sets email to be sent and number of days from today to send it
 const EMAIL_ON = true;
-const DAYS_AHEAD_TO_SEND = 0;
+const DAYS_AHEAD_TO_SEND = 0; // Same day is 0
 
 // Returns formatted date to send email in EST as a string
 function getEmailDate(timeZone) {
@@ -40,7 +44,7 @@ function getEmailDate(timeZone) {
   return Utilities.formatDate(date, timeZone, "EEE, MMM d, yyyy");
 }
 
-// Uses ematil.html as a template, evaluates the variables, and sends it as email
+// Uses email.html as a template, evaluates the variables, and sends it as email
 function sendEmailNotification(content, subject, emailAddress) {
   let template = HtmlService.createTemplateFromFile("email");
   template.content = content;
@@ -55,11 +59,12 @@ function main() {
   const sheet = ss.getSheetByName(SHEET_NAME);
   const range = sheet.getDataRange();
   const rows = range.getDisplayValues();
-  const sheetURL = ss.getUrl();
   const lastRow = range.getLastRow();
   const dataRow = HEADER_ROW + 1;
   const timeZone = ss.getSpreadsheetTimeZone();
   const emailDate = getEmailDate(timeZone);
+  const sheetURL = ss.getUrl();
+  const plan = ss.getRangeByName("PlanSelected").getValues().toString();
 
   // Creates empty dictionary to collect data for email
   let emailContent = {};
@@ -80,7 +85,7 @@ function main() {
         workout: row[COLUMNS.workout],
         exercises: getExercise(row[COLUMNS.exercise]),
         link: row[COLUMNS.link],
-        plan: rows[4][0],
+        plan,
         sheetURL,
       };
       break;
