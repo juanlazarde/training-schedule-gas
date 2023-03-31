@@ -2,11 +2,16 @@
 
 This is an Apps Script code that sends email reminders about upcoming workouts from a Google Sheet that contains a training schedule. The code sets up the constants for the sheet name, header row and column names, and email settings. It then creates a `Spreadsheet` class that represents the training schedule, with methods for getting the email content. Finally, it creates an `EmailSender` class that sends the email using a template file and the `MailApp` service. The `main()` function brings everything together by creating instances of the `Spreadsheet` and `EmailSender` classes and sending the email if email reminders are turned on and there is an upcoming workout scheduled.
 
-There're two working versions of this code. `Code` uses classes and it's the one that I use. `Code with functions` it's easier to understand.
+There're two working versions of this code. `Code.js` uses classes and it's the one that I use, and `Code with functions.js` it's easier to understand.
 
 ## Google Sheet
 
 This code requires a Google Spreadsheet to work. You can get a sample sheet [here](https://docs.google.com/spreadsheets/d/1OrGPV743KBXale8ZKQXNKI8ubKRcnBoipjITNq0zHm4/edit?usp=sharing). The sheet named "Training Schedule", should have a header row that contains the column names for the data, data for upcoming workouts scheduled in the future, the name should match the `SHEET_NAME` constant defined in the code, and a named range called "PlanSelected" that contains the name of the training plan.
+
+### Interesting facts about the Sheet
+
+It uses `FORMULAARRAY` or Dynamic Arrays. Notice how the first row (in yellow) is the only one with formulas. Also, notice how one has the `LET` formula to make these formulas understandable.
+Finally, there's a named range for the `PlanSelected` which is then retrieved by the code and used in filling the email.
 
 ## Email Template
 
@@ -24,7 +29,7 @@ To use this code, and set up the Google Apps Script with triggers to run once a 
 6. Set the number of days ahead to send the email by changing the value of the `DAYS_AHEAD_TO_SEND` constant.
 7. Save the project with a name of your choice.
 
-## Setup
+### Setup
 
 Before running this script, please set the following constants:
 
@@ -35,7 +40,7 @@ Before running this script, please set the following constants:
 - `DAYS_AHEAD_TO_SEND`: the number of days ahead of the date to send the email.
 - `EMAIL_TEMPLATE_FILE`: the name of the HTML template file to use for the email. Default is `email`.
 
-## Usage
+### Usage
 
 To use this code, follow the steps below:
 
@@ -43,7 +48,7 @@ To use this code, follow the steps below:
 2. Enter the training schedule data in the correct format.
 3. Run the `main` function to send the email reminder.
 
-## Automation
+### Automation
 
 1. Run the `main` function to test the code.
 2. Click on **Triggers > + Add Trigger** button in the bottom right corner.
