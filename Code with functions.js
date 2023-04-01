@@ -63,8 +63,6 @@ function main() {
   const dataRow = HEADER_ROW + 1;
   const timeZone = ss.getSpreadsheetTimeZone();
   const emailDate = getEmailDate(timeZone);
-  const sheetURL = ss.getUrl();
-  const plan = ss.getRangeByName("PlanSelected").getValues().toString();
 
   // Creates empty dictionary to collect data for email
   let emailContent = {};
@@ -78,15 +76,20 @@ function main() {
       // Returns an array if "|" character is present in the exercise string
       const getExercise = (x) => (x.indexOf("|") > -1 ? x.split(" | ") : x);
 
+      // Returns 'Rest day' if workouts are empty
+      const getWorkout = (x) => (x.trim() ? x : "Rest day");
+
+      const plan = ss.getRangeByName("PlanSelected").getValues().toString();
+
       emailContent = {
         date: row[COLUMNS.date],
         week: row[COLUMNS.week],
         dte: row[COLUMNS.dte],
-        workout: row[COLUMNS.workout],
+        workout: getWorkout(row[COLUMNS.workout]),
         exercises: getExercise(row[COLUMNS.exercise]),
         link: row[COLUMNS.link],
         plan,
-        sheetURL,
+        sheetURL: ss.getUrl(),
       };
       break;
     }

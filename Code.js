@@ -49,8 +49,6 @@ class Spreadsheet {
     this.dataRow = HEADER_ROW + 1;
     this.timeZone = this.ss.getSpreadsheetTimeZone();
     this.emailDate = this.getEmailDate(this.timeZone);
-    this.sheetURL = this.ss.getUrl();
-    this.plan = this.ss.getRangeByName("PlanSelected").getValues().toString();
   }
 
   /**
@@ -78,17 +76,24 @@ class Spreadsheet {
         // Returns an array if "|" character is present in the exercise string
         const getExercise = (x) => (x.indexOf("|") > -1 ? x.split(" | ") : x);
 
-        let emailContent = {
+        // Returns 'Rest day' if workouts are empty
+        const getWorkout = (x) => (x.trim() ? x : "Rest day");
+
+        const plan = this.ss
+          .getRangeByName("PlanSelected")
+          .getValues()
+          .toString();
+
+        return {
           date: row[COLUMNS.date],
           week: row[COLUMNS.week],
           dte: row[COLUMNS.dte],
-          workout: row[COLUMNS.workout],
+          workout: getWorkout(row[COLUMNS.workout]),
           exercises: getExercise(row[COLUMNS.exercise]),
           link: row[COLUMNS.link],
-          plan: this.plan,
-          sheetURL: this.sheetURL,
+          plan,
+          sheetUrl: this.ss.getUrl(),
         };
-        return emailContent;
       }
     }
     return null;
